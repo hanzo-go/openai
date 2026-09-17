@@ -68,7 +68,7 @@ func TestMultiplePromptsCompletionsWrong(t *testing.T) {
 	req := openai.CompletionRequest{
 		MaxTokens: 5,
 		Model:     "ada",
-		Prompt:    []interface{}{"Lorem ipsum", 9},
+		Prompt:    []any{"Lorem ipsum", 9},
 	}
 	_, err := client.CreateCompletion(context.Background(), req)
 	if !errors.Is(err, openai.ErrCompletionRequestPromptTypeNotSupported) {
@@ -85,7 +85,7 @@ func TestMultiplePromptsCompletions(t *testing.T) {
 	req := openai.CompletionRequest{
 		MaxTokens: 5,
 		Model:     "ada",
-		Prompt:    []interface{}{"Lorem ipsum", "Lorem ipsum"},
+		Prompt:    []any{"Lorem ipsum", "Lorem ipsum"},
 	}
 	_, err := client.CreateCompletion(context.Background(), req)
 	checks.NoError(t, err, "CreateCompletion error")
@@ -124,7 +124,7 @@ func handleCompletionEndpoint(w http.ResponseWriter, r *http.Request) {
 	switch v := completionReq.Prompt.(type) {
 	case string:
 		prompts = append(prompts, v)
-	case []interface{}:
+	case []any:
 		for _, item := range v {
 			if str, ok := item.(string); ok {
 				prompts = append(prompts, str)

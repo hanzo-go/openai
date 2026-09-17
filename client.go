@@ -157,21 +157,21 @@ func (c *Client) sendRequestRaw(req *http.Request) (response RawResponse, err er
 	return
 }
 
-func sendRequestStream[T streamable](client *Client, req *http.Request) (*streamReader[T], error) {
+func (c *Client) sendRequestStream[T streamable](req *http.Request) (*streamReader[T], error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "text/event-stream")
 	req.Header.Set("Cache-Control", "no-cache")
 	req.Header.Set("Connection", "keep-alive")
 
-	resp, err := client.config.HTTPClient.Do(req) //nolint:bodyclose // body is closed in stream.Close()
+	resp, err := c.config.HTTPClient.Do(req) //nolint:bodyclose // body is closed in stream.Close()
 	if err != nil {
 		return new(streamReader[T]), err
 	}
 	if isFailureStatusCode(resp) {
-		return new(streamReader[T]), client.handleErrorResp(resp)
+		return new(streamReader[T]), c.handleErrorResp(resp)
 	}
 	return &streamReader[T]{
-		emptyMessagesLimit: client.config.EmptyMessagesLimit,
+		emptyMessagesLimit: c.config.EmptyMessagesLimit,
 		reader:             bufio.NewReader(resp.Body),
 		response:           resp,
 		errAccumulator:     utils.NewErrorAccumulator(),

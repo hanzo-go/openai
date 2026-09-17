@@ -205,9 +205,7 @@ func TestRun(t *testing.T) {
 	checks.NoError(t, err, "CancelRun error")
 
 	_, err = client.CreateThreadAndRun(ctx, openai.CreateThreadAndRunRequest{
-		RunRequest: openai.RunRequest{
-			AssistantID: assistantID,
-		},
+		AssistantID: assistantID,
 		Thread: openai.ThreadRequest{
 			Messages: []openai.ThreadMessage{
 				{

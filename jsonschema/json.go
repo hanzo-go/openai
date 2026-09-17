@@ -95,7 +95,7 @@ func reflectSchema(t reflect.Type) (*Definition, error) {
 			return nil, err
 		}
 		d = *object
-	case reflect.Ptr:
+	case reflect.Pointer:
 		definition, err := reflectSchema(t.Elem())
 		if err != nil {
 			return nil, err
@@ -117,8 +117,7 @@ func reflectSchemaObject(t reflect.Type) (*Definition, error) {
 	}
 	properties := make(map[string]Definition)
 	var requiredFields []string
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
+	for field := range t.Fields() {
 		if !field.IsExported() {
 			continue
 		}
@@ -126,8 +125,8 @@ func reflectSchemaObject(t reflect.Type) (*Definition, error) {
 		var required = true
 		if jsonTag == "" {
 			jsonTag = field.Name
-		} else if strings.HasSuffix(jsonTag, ",omitempty") {
-			jsonTag = strings.TrimSuffix(jsonTag, ",omitempty")
+		} else if before, ok := strings.CutSuffix(jsonTag, ",omitempty"); ok {
+			jsonTag = before
 			required = false
 		}
 
